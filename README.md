@@ -13,7 +13,7 @@ A lightweight, browser-based tool to convert images into a single PDF — no log
 - **Two layout modes**
   - **A4 Centered** — image scaled to fit and centered on a white A4 page (210×297mm). Ideal for printing and assignment submissions.
   - **Plain** — each page is sized exactly to the image's native dimensions. Image fills the page edge-to-edge with no background or margins.
-- **Multi-image support** — add multiple JPG/JPEG/PNG files; they are auto-sorted A→Z and can be manually reordered by drag-and-drop (please not the drag-and-drop works only on desktop)
+- **Multi-image support** — add multiple JPG/JPEG/PNG files; they are auto-sorted A→Z and can be manually reordered by drag-and-drop (please note that the drag-and-drop works only on desktop)
 - **Custom filename** — name your output PDF before downloading.
 - **Light/Dark theme** — toggleable via the nav bar.
 - **100% client-side** — no files are uploaded to any server. Everything runs in the browser using [jsPDF](https://github.com/parallax/jsPDF).
