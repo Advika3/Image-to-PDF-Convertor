@@ -54,3 +54,11 @@ The JavaScript implementation was built with AI assistance (Claude by Anthropic)
 I also reviewed, tested, and iterated on every output until it worked correctly. 
 Using AI as an implementation tool while owning the product decisions is a legitimate way to build,
 and I'd rather be upfront about it than not :) 
+
+## License
+
+Copyright (c) [2026] [Advika Kshirsagar]
+
+All rights reserved. This project and its source code are for viewing purposes 
+only. No permission is granted to reproduce, distribute, or create derivative 
+works from this project without explicit written permission from the author.
