@@ -22,21 +22,23 @@ A lightweight, browser-based tool to convert images into a single PDF — no log
 
 ## Usage
 
-1. Open `index.html` in any modern browser.
-2. Drop or select your images (JPG, JPEG, PNG).
-3. Choose a layout — **A4 Centered** or **Plain**.
-4. Enter a filename.
-5. Click **Convert & Download PDF**.
+1. Drop or select your images (JPG, JPEG, PNG).
+2. Choose a layout — **A4 Centered** or **Plain**.
+3. Enter a filename.
+4. Click **Convert & Download PDF**.
 
 ---
 
 ## Tech Stack
 
-| Concern | Solution |
-|---|---|
-| PDF generation | [jsPDF 2.5.1](https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js) via CDN |
-| Fonts | Cormorant Garamond + DM Sans via Google Fonts |
-| Hosting | None required — single static HTML file |
+## Tech Stack
+
+
+| Category | Tools |
+| :--- | :--- |
+| **PDF Generation** | [jsPDF 2.5.1](https://github.com) via CDN |
+| **Fonts** | Cormorant Garamond + DM Sans via Google Fonts |
+| **Hosting** | None (Single static HTML file) |
 
 ---
 
