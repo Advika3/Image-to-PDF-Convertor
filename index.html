@@ -369,6 +369,566 @@ async function convert(){
         doc.addImage(imgs[i].url,fmt,x,y,dw,dh);
 
       } else {
+        // Plain: page is exactly the image's native pixel dimensions (using 'px' unit).
+        // 1 px unit in jsPDF = 1 point at 72dpi, so the page matches the image 1:1
+        // and the image fills it edge-to-edge with zero white border.
+        if(!doc){
+          doc=new jsPDF({unit:'px',format:[nw,nh],hotfixes:['px_scaling']});
+        } else {
+          doc.addPage([nw,nh]);
+        }
+        doc.addImage(imgs[i].url,fmt,0,0,nw,nh);
+      }
+    }
+
+    doc.save((document.getElementById('fname').value.trim()||'output')+'.pdf');
+    ov.classList.remove('show');
+    showToast('PDF downloaded successfully!');
+  }catch(e){
+    ov.classList.remove('show');
+    showToast('Something went wrong — please try again.',true);
+    console.error(e);
+  }
+}
+</script>
+</body>
+</html>
+  .hero{padding:3.5rem 1.25rem 2.5rem;}
+  .hero h1{font-size:2.2rem;}
+  .main{padding:0 1.25rem 5rem;}
+  .nav{padding:0 1.25rem;}
+  footer{flex-direction:column;gap:.75rem;text-align:center;}
+  .card{padding:1.4rem;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">Img<em>To</em>PDF</div>
+  <div class="nav-r">
+    <a href="https://www.linkedin.com/in/advika-kshirsagar-b600a439a/" target="_blank" class="nav-a">LinkedIn</a>
+    <a href="https://github.com/Advika3" target="_blank" class="nav-a">GitHub</a>
+    <div class="ndiv"></div>
+    <div class="tgl-wrap" onclick="toggleTheme()">
+      <span class="tgl-lbl" id="tglLbl">Light</span>
+      <button class="tgl" id="tgl" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-pill">
+    <div class="pill-dot"></div>
+    <span>Free</span><span class="pill-sep">·</span>
+    <span>No login</span><span class="pill-sep">·</span>
+    <span>Files stay local</span>
+  </div>
+  <h1>Your images,<br/>one <em>clean PDF</em></h1>
+  <p class="hero-sub">Select images, pick a layout, name your file — done. Everything runs in your browser. Your files never leave your device.</p>
+  <div class="hero-badges">
+    <span class="hbadge"><div class="bdot"></div>100% private</span>
+    <span class="hbadge"><div class="bdot"></div>Instant download</span>
+    <span class="hbadge"><div class="bdot"></div>JPG · JPEG · PNG</span>
+  </div>
+</div>
+
+<div class="main">
+  <div id="toast" class="toast" role="alert"></div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-num">01</span>
+      <span class="card-title">Select images</span>
+      <span class="card-badge" id="imgBadge"></span>
+    </div>
+    <div class="drop" id="drop">
+      <div class="drop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <p>Drop images here, or <span id="browseBtn">browse your files</span></p>
+      <p class="drop-meta">JPG · JPEG · PNG &nbsp;·&nbsp; auto-sorted A→Z &nbsp;·&nbsp; drag to reorder</p>
+    </div>
+    <input type="file" id="fi" accept=".jpg,.jpeg,.png" multiple/>
+    <div class="pgrid" id="pgrid" style="display:none;"></div>
+    <p class="drag-hint" id="dhint" style="display:none;">↕ Drag thumbnails to reorder · click × to remove</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-num">02</span>
+      <span class="card-title">Choose layout</span>
+    </div>
+    <div class="mgrid">
+      <div class="mopt sel" id="mA4" onclick="setMode('a4')">
+        <div class="mopt-preview">
+          <div class="a4prev"><div class="margin-lines"></div><div class="img-thumb"></div></div>
+        </div>
+        <div class="mopt-title">A4 Centered</div>
+        <div class="mopt-desc">Image centered on a white A4 page. Perfect for printing and submitting assignments.</div>
+      </div>
+      <div class="mopt" id="mPlain" onclick="setMode('plain')">
+        <div class="mopt-preview">
+          <div class="plainprev"><div class="plainprev-fill"></div><div class="plainprev-img">IMG</div></div>
+        </div>
+        <div class="mopt-title">Plain</div>
+        <div class="mopt-desc">Image fills the entire page edge to edge. No white background.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-num">03</span>
+      <span class="card-title">Name your PDF</span>
+    </div>
+    <div class="fname-row">
+      <input class="fname-in" type="text" id="fname" placeholder="e.g. assignment-3" value="output"/>
+      <span class="ext">.pdf</span>
+    </div>
+  </div>
+
+  <div class="privacy-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    <p><strong>Your files stay on your device.</strong> This tool runs entirely in your browser. No images are uploaded to any server, stored, or shared — ever.</p>
+  </div>
+
+  <button class="cvt-btn" id="cvtBtn" onclick="convert()" disabled>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="12" y1="18" x2="12" y2="12"/>
+      <line x1="9" y1="15" x2="12" y2="18"/>
+      <line x1="15" y1="15" x2="12" y2="18"/>
+    </svg>
+    Convert &amp; Download PDF
+  </button>
+</div>
+
+<footer>
+  <span>Built by <a href="https://www.linkedin.com/in/advika-kshirsagar-b600a439a/" target="_blank">Advika Kshirsagar</a></span>
+  <div class="flinks">
+    <a href="https://www.linkedin.com/in/advika-kshirsagar-b600a439a/" target="_blank">LinkedIn</a>
+    <a href="https://github.com/Advika3" target="_blank">GitHub</a>
+  </div>
+</footer>
+
+<div class="ov" id="ov">
+  <div class="ov-card">
+    <div class="spin"></div>
+    <div class="ov-title">Creating your PDF…</div>
+    <div class="ov-fact" id="fact"></div>
+  </div>
+</div>
+
+<script>
+const facts=["PDF was invented by Adobe in 1993 — same year as the World Wide Web.","A PDF can embed fonts, images, and even 3D models.","Pillow (PIL) is one of Python's oldest imaging libraries, from 1995.","PDF/A is an archival format designed to last over 100 years.","jsPDF, the library powering this tool, has been open source since 2010.","Inside, a PDF is actually a kind of mini programming language.","The average college assignment PDF weighs under 2 MB."];
+let imgs=[],mode='a4',dragSrc=null;
+
+function toggleTheme(){
+  const d=document.documentElement,dark=d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('tgl').classList.toggle('on',!dark);
+  document.getElementById('tglLbl').textContent=dark?'Light':'Dark';
+}
+function setMode(m){
+  mode=m;
+  document.getElementById('mA4').classList.toggle('sel',m==='a4');
+  document.getElementById('mPlain').classList.toggle('sel',m==='plain');
+}
+function showToast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show '+(err?'err':'ok');
+  setTimeout(()=>{t.className='toast';},3500);
+}
+function updateBadge(){
+  const b=document.getElementById('imgBadge');
+  if(imgs.length){b.textContent=imgs.length+' image'+(imgs.length>1?'s':'');b.classList.add('show');}
+  else{b.classList.remove('show');}
+}
+document.getElementById('browseBtn').onclick=()=>document.getElementById('fi').click();
+document.getElementById('drop').onclick=e=>{if(e.target.id!=='browseBtn')document.getElementById('fi').click();};
+document.getElementById('drop').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('drop').classList.add('over');});
+document.getElementById('drop').addEventListener('dragleave',()=>document.getElementById('drop').classList.remove('over'));
+document.getElementById('drop').addEventListener('drop',e=>{e.preventDefault();document.getElementById('drop').classList.remove('over');handleFiles(e.dataTransfer.files);});
+document.getElementById('fi').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
+
+function handleFiles(files){
+  const valid=Array.from(files).filter(f=>/\.(jpe?g|png)$/i.test(f.name));
+  if(!valid.length){showToast('Please select JPG, JPEG or PNG images only.',true);return;}
+  const existing=new Set(imgs.map(i=>i.name));
+  const fresh=valid.filter(f=>!existing.has(f.name));
+  if(!fresh.length){showToast('These images are already added.',true);return;}
+  let done=0;const loaded=[];
+  fresh.forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      loaded.push({name:f.name,url:ev.target.result});
+      if(++done===fresh.length){
+        imgs=imgs.concat(loaded).sort((a,b)=>a.name.localeCompare(b.name));
+        renderGrid();
+      }
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function renderGrid(){
+  const g=document.getElementById('pgrid'),h=document.getElementById('dhint');
+  g.innerHTML='';
+  if(!imgs.length){g.style.display='none';h.style.display='none';document.getElementById('cvtBtn').disabled=true;updateBadge();return;}
+  g.style.display='grid';h.style.display='block';
+  imgs.forEach((img,i)=>{
+    const el=document.createElement('div');
+    el.className='pitem';el.draggable=true;
+    el.innerHTML=`<img src="${img.url}" alt="${img.name}"/>
+      <div class="xbtn"><svg viewBox="0 0 10 10" fill="none" stroke="#f0f0ec" stroke-width="1.6" stroke-linecap="round"><line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/></svg></div>
+      <div class="pname">${img.name}</div>`;
+    el.addEventListener('dragstart',e=>{dragSrc=i;el.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    el.addEventListener('dragend',()=>{el.classList.remove('dragging');document.querySelectorAll('.pitem').forEach(x=>x.classList.remove('dtarget'));});
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dtarget');});
+    el.addEventListener('dragleave',()=>el.classList.remove('dtarget'));
+    el.addEventListener('drop',e=>{
+      e.preventDefault();
+      if(dragSrc===null||dragSrc===i)return;
+      const mv=imgs.splice(dragSrc,1)[0];imgs.splice(i,0,mv);renderGrid();
+    });
+    el.querySelector('.xbtn').addEventListener('click',e=>{e.stopPropagation();imgs.splice(i,1);renderGrid();});
+    g.appendChild(el);
+  });
+  document.getElementById('cvtBtn').disabled=false;
+  updateBadge();
+}
+
+async function convert(){
+  if(!imgs.length){showToast('Add some images first!',true);return;}
+  const ov=document.getElementById('ov');
+  document.getElementById('fact').textContent=facts[Math.floor(Math.random()*facts.length)];
+  ov.classList.add('show');
+  await new Promise(r=>setTimeout(r,60));
+  try{
+    const {jsPDF}=window.jspdf;
+    let doc=null;
+
+    for(let i=0;i<imgs.length;i++){
+      const im=await new Promise((res,rej)=>{
+        const x=new Image();x.onload=()=>res(x);x.onerror=rej;x.src=imgs[i].url;
+      });
+      const fmt=/\.png$/i.test(imgs[i].name)?'PNG':'JPEG';
+      const nw=im.naturalWidth;
+      const nh=im.naturalHeight;
+
+      if(mode==='a4'){
+        // A4: always portrait 210x297mm, white bg, image scaled to fit centered
+        const A4W=210,A4H=297;
+        const scale=Math.min(A4W/nw,A4H/nh);
+        const dw=nw*scale,dh=nh*scale;
+        const x=(A4W-dw)/2,y=(A4H-dh)/2;
+        if(!doc)doc=new jsPDF({unit:'mm',format:'a4'});
+        else doc.addPage('a4');
+        doc.setFillColor(255,255,255);
+        doc.rect(0,0,A4W,A4H,'F');
+        doc.addImage(imgs[i].url,fmt,x,y,dw,dh);
+
+      } else {
+        // Plain: page is exactly the image's native pixel dimensions (using 'px' unit).
+        // 1 px unit in jsPDF = 1 point at 72dpi, so the page matches the image 1:1
+        // and the image fills it edge-to-edge with zero white border.
+        if(!doc){
+          doc=new jsPDF({unit:'px',format:[nw,nh],hotfixes:['px_scaling']});
+        } else {
+          doc.addPage([nw,nh]);
+        }
+        doc.addImage(imgs[i].url,fmt,0,0,nw,nh);
+      }
+    }
+
+    doc.save((document.getElementById('fname').value.trim()||'output')+'.pdf');
+    ov.classList.remove('show');
+    showToast('PDF downloaded successfully!');
+  }catch(e){
+    ov.classList.remove('show');
+    showToast('Something went wrong — please try again.',true);
+    console.error(e);
+  }
+}
+</script>
+</body>
+</html>
+.cvt-btn{width:100%;height:50px;background:var(--accent-dark);color:#f0f0ec;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:500;cursor:pointer;letter-spacing:.3px;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.cvt-btn:hover:not(:disabled){background:var(--accent-mid);}
+.cvt-btn:active:not(:disabled){transform:scale(.985);}
+.cvt-btn:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;}
+[data-theme="dark"] .cvt-btn{background:var(--accent);color:#141412;}
+[data-theme="dark"] .cvt-btn:hover:not(:disabled){background:var(--accent-mid);}
+.toast{display:none;border-radius:10px;padding:.75rem 1rem;font-size:.82rem;font-weight:300;margin-bottom:1.2rem;}
+.toast.show{display:block;}
+.toast.ok{background:var(--accent-light);border:1px solid var(--accent);color:var(--accent-dark);}
+.toast.err{background:#fde8e8;border:1px solid #e0a0a0;color:#7a2020;}
+[data-theme="dark"] .toast.ok{color:var(--accent-dark);}
+[data-theme="dark"] .toast.err{background:#2a1a1a;border-color:#804040;color:#e0a0a0;}
+.ov{display:none;position:fixed;inset:0;background:rgba(20,20,18,.65);z-index:200;align-items:center;justify-content:center;}
+.ov.show{display:flex;}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:2.5rem 3rem;text-align:center;max-width:280px;}
+.spin{width:30px;height:30px;border:2px solid var(--accent-light);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1.1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ov-title{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:400;color:var(--text);margin-bottom:.4rem;}
+.ov-fact{font-size:.74rem;font-weight:300;color:var(--text3);font-style:italic;line-height:1.6;}
+footer{border-top:1px solid var(--border);padding:2rem 2.5rem;display:flex;align-items:center;justify-content:space-between;font-size:.74rem;font-weight:300;color:var(--text3);}
+footer a{color:var(--accent);text-decoration:none;font-weight:400;transition:color .2s;}
+footer a:hover{color:var(--accent-mid);}
+.flinks{display:flex;gap:1.5rem;}
+@media(max-width:560px){
+  .hero{padding:3.5rem 1.25rem 2.5rem;}
+  .hero h1{font-size:2.2rem;}
+  .main{padding:0 1.25rem 5rem;}
+  .nav{padding:0 1.25rem;}
+  footer{flex-direction:column;gap:.75rem;text-align:center;}
+  .card{padding:1.4rem;}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">Img<em>To</em>PDF</div>
+  <div class="nav-r">
+    <a href="https://www.linkedin.com/in/advika-kshirsagar-b600a439a/" target="_blank" class="nav-a">LinkedIn</a>
+    <a href="https://github.com/Advika3" target="_blank" class="nav-a">GitHub</a>
+    <div class="ndiv"></div>
+    <div class="tgl-wrap" onclick="toggleTheme()">
+      <span class="tgl-lbl" id="tglLbl">Light</span>
+      <button class="tgl" id="tgl" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-pill">
+    <div class="pill-dot"></div>
+    <span>Free</span><span class="pill-sep">·</span>
+    <span>No login</span><span class="pill-sep">·</span>
+    <span>Files stay local</span>
+  </div>
+  <h1>Your images,<br/>one <em>clean PDF</em></h1>
+  <p class="hero-sub">Select images, pick a layout, name your file — done. Everything runs in your browser. Your files never leave your device.</p>
+  <div class="hero-badges">
+    <span class="hbadge"><div class="bdot"></div>100% private</span>
+    <span class="hbadge"><div class="bdot"></div>Instant download</span>
+    <span class="hbadge"><div class="bdot"></div>JPG · JPEG · PNG</span>
+  </div>
+</div>
+
+<div class="main">
+  <div id="toast" class="toast" role="alert"></div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-num">01</span>
+      <span class="card-title">Select images</span>
+      <span class="card-badge" id="imgBadge"></span>
+    </div>
+    <div class="drop" id="drop">
+      <div class="drop-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <p>Drop images here, or <span id="browseBtn">browse your files</span></p>
+      <p class="drop-meta">JPG · JPEG · PNG &nbsp;·&nbsp; auto-sorted A→Z &nbsp;·&nbsp; drag to reorder</p>
+    </div>
+    <input type="file" id="fi" accept=".jpg,.jpeg,.png" multiple/>
+    <div class="pgrid" id="pgrid" style="display:none;"></div>
+    <p class="drag-hint" id="dhint" style="display:none;">↕ Drag thumbnails to reorder · click × to remove</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-num">02</span>
+      <span class="card-title">Choose layout</span>
+    </div>
+    <div class="mgrid">
+      <div class="mopt sel" id="mA4" onclick="setMode('a4')">
+        <div class="mopt-preview">
+          <div class="a4prev"><div class="margin-lines"></div><div class="img-thumb"></div></div>
+        </div>
+        <div class="mopt-title">A4 Centered</div>
+        <div class="mopt-desc">Image centered on a white A4 page. Perfect for printing and submitting assignments.</div>
+      </div>
+      <div class="mopt" id="mPlain" onclick="setMode('plain')">
+        <div class="mopt-preview">
+          <div class="plainprev"><div class="plainprev-fill"></div><div class="plainprev-img">IMG</div></div>
+        </div>
+        <div class="mopt-title">Plain</div>
+        <div class="mopt-desc">Image fills the entire page edge to edge. No white background.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-num">03</span>
+      <span class="card-title">Name your PDF</span>
+    </div>
+    <div class="fname-row">
+      <input class="fname-in" type="text" id="fname" placeholder="e.g. assignment-3" value="output"/>
+      <span class="ext">.pdf</span>
+    </div>
+  </div>
+
+  <div class="privacy-note">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+    <p><strong>Your files stay on your device.</strong> This tool runs entirely in your browser. No images are uploaded to any server, stored, or shared — ever.</p>
+  </div>
+
+  <button class="cvt-btn" id="cvtBtn" onclick="convert()" disabled>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="12" y1="18" x2="12" y2="12"/>
+      <line x1="9" y1="15" x2="12" y2="18"/>
+      <line x1="15" y1="15" x2="12" y2="18"/>
+    </svg>
+    Convert &amp; Download PDF
+  </button>
+</div>
+
+<footer>
+  <span>Built by <a href="https://www.linkedin.com/in/advika-kshirsagar-b600a439a/" target="_blank">Advika Kshirsagar</a></span>
+  <div class="flinks">
+    <a href="https://www.linkedin.com/in/advika-kshirsagar-b600a439a/" target="_blank">LinkedIn</a>
+    <a href="https://github.com/Advika3" target="_blank">GitHub</a>
+  </div>
+</footer>
+
+<div class="ov" id="ov">
+  <div class="ov-card">
+    <div class="spin"></div>
+    <div class="ov-title">Creating your PDF…</div>
+    <div class="ov-fact" id="fact"></div>
+  </div>
+</div>
+
+<script>
+const facts=["PDF was invented by Adobe in 1993 — same year as the World Wide Web.","A PDF can embed fonts, images, and even 3D models.","Pillow (PIL) is one of Python's oldest imaging libraries, from 1995.","PDF/A is an archival format designed to last over 100 years.","jsPDF, the library powering this tool, has been open source since 2010.","Inside, a PDF is actually a kind of mini programming language.","The average college assignment PDF weighs under 2 MB."];
+let imgs=[],mode='a4',dragSrc=null;
+
+function toggleTheme(){
+  const d=document.documentElement,dark=d.getAttribute('data-theme')==='dark';
+  d.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('tgl').classList.toggle('on',!dark);
+  document.getElementById('tglLbl').textContent=dark?'Light':'Dark';
+}
+function setMode(m){
+  mode=m;
+  document.getElementById('mA4').classList.toggle('sel',m==='a4');
+  document.getElementById('mPlain').classList.toggle('sel',m==='plain');
+}
+function showToast(msg,err){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show '+(err?'err':'ok');
+  setTimeout(()=>{t.className='toast';},3500);
+}
+function updateBadge(){
+  const b=document.getElementById('imgBadge');
+  if(imgs.length){b.textContent=imgs.length+' image'+(imgs.length>1?'s':'');b.classList.add('show');}
+  else{b.classList.remove('show');}
+}
+document.getElementById('browseBtn').onclick=()=>document.getElementById('fi').click();
+document.getElementById('drop').onclick=e=>{if(e.target.id!=='browseBtn')document.getElementById('fi').click();};
+document.getElementById('drop').addEventListener('dragover',e=>{e.preventDefault();document.getElementById('drop').classList.add('over');});
+document.getElementById('drop').addEventListener('dragleave',()=>document.getElementById('drop').classList.remove('over'));
+document.getElementById('drop').addEventListener('drop',e=>{e.preventDefault();document.getElementById('drop').classList.remove('over');handleFiles(e.dataTransfer.files);});
+document.getElementById('fi').onchange=e=>{handleFiles(e.target.files);e.target.value='';};
+
+function handleFiles(files){
+  const valid=Array.from(files).filter(f=>/\.(jpe?g|png)$/i.test(f.name));
+  if(!valid.length){showToast('Please select JPG, JPEG or PNG images only.',true);return;}
+  const existing=new Set(imgs.map(i=>i.name));
+  const fresh=valid.filter(f=>!existing.has(f.name));
+  if(!fresh.length){showToast('These images are already added.',true);return;}
+  let done=0;const loaded=[];
+  fresh.forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      loaded.push({name:f.name,url:ev.target.result});
+      if(++done===fresh.length){
+        imgs=imgs.concat(loaded).sort((a,b)=>a.name.localeCompare(b.name));
+        renderGrid();
+      }
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function renderGrid(){
+  const g=document.getElementById('pgrid'),h=document.getElementById('dhint');
+  g.innerHTML='';
+  if(!imgs.length){g.style.display='none';h.style.display='none';document.getElementById('cvtBtn').disabled=true;updateBadge();return;}
+  g.style.display='grid';h.style.display='block';
+  imgs.forEach((img,i)=>{
+    const el=document.createElement('div');
+    el.className='pitem';el.draggable=true;
+    el.innerHTML=`<img src="${img.url}" alt="${img.name}"/>
+      <div class="xbtn"><svg viewBox="0 0 10 10" fill="none" stroke="#f0f0ec" stroke-width="1.6" stroke-linecap="round"><line x1="2" y1="2" x2="8" y2="8"/><line x1="8" y1="2" x2="2" y2="8"/></svg></div>
+      <div class="pname">${img.name}</div>`;
+    el.addEventListener('dragstart',e=>{dragSrc=i;el.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+    el.addEventListener('dragend',()=>{el.classList.remove('dragging');document.querySelectorAll('.pitem').forEach(x=>x.classList.remove('dtarget'));});
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('dtarget');});
+    el.addEventListener('dragleave',()=>el.classList.remove('dtarget'));
+    el.addEventListener('drop',e=>{
+      e.preventDefault();
+      if(dragSrc===null||dragSrc===i)return;
+      const mv=imgs.splice(dragSrc,1)[0];imgs.splice(i,0,mv);renderGrid();
+    });
+    el.querySelector('.xbtn').addEventListener('click',e=>{e.stopPropagation();imgs.splice(i,1);renderGrid();});
+    g.appendChild(el);
+  });
+  document.getElementById('cvtBtn').disabled=false;
+  updateBadge();
+}
+
+async function convert(){
+  if(!imgs.length){showToast('Add some images first!',true);return;}
+  const ov=document.getElementById('ov');
+  document.getElementById('fact').textContent=facts[Math.floor(Math.random()*facts.length)];
+  ov.classList.add('show');
+  await new Promise(r=>setTimeout(r,60));
+  try{
+    const {jsPDF}=window.jspdf;
+    let doc=null;
+
+    for(let i=0;i<imgs.length;i++){
+      const im=await new Promise((res,rej)=>{
+        const x=new Image();x.onload=()=>res(x);x.onerror=rej;x.src=imgs[i].url;
+      });
+      const fmt=/\.png$/i.test(imgs[i].name)?'PNG':'JPEG';
+      const nw=im.naturalWidth;
+      const nh=im.naturalHeight;
+
+      if(mode==='a4'){
+        // A4: always portrait 210x297mm, white bg, image scaled to fit centered
+        const A4W=210,A4H=297;
+        const scale=Math.min(A4W/nw,A4H/nh);
+        const dw=nw*scale,dh=nh*scale;
+        const x=(A4W-dw)/2,y=(A4H-dh)/2;
+        if(!doc)doc=new jsPDF({unit:'mm',format:'a4'});
+        else doc.addPage('a4');
+        doc.setFillColor(255,255,255);
+        doc.rect(0,0,A4W,A4H,'F');
+        doc.addImage(imgs[i].url,fmt,x,y,dw,dh);
+
+      } else {
         // Plain: convert native pixels → mm at 96dpi (px * 25.4 / 96).
         // CRITICAL: jsPDF silently swaps [w,h] to enforce portrait when orientation
         // is omitted. Must pass explicit orientation so dimensions are never swapped.
